@@ -8,7 +8,6 @@ const timeNumers: string[] = ['one', 'two', 'three', 'four', 'five', 'six', 'sev
 const Clock: React.FC = () => {
   const [time, setTime] = useState<Date>(new Date());
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
-  const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
 
   const getCurrentTime = (): string => {
     const sec = time.getSeconds() > 9 ? time.getSeconds() : `0${time.getSeconds()}`;
@@ -19,19 +18,21 @@ const Clock: React.FC = () => {
 
   useEffect(() => {
     const timerId: ReturnType<typeof setTimeout> = setTimeout(() => {
-      axios.get(`http://worldtimeapi.org/api/timezone/${timeZone}`)
+      axios.get('https://timezone.abstractapi.com/v1/current_time/?api_key=13e8c3716c514c4593b49ab551182742&location=Europe, Moscow')
         .then((data) => {
           const apiTime = new Date(data.data.datetime);
           setTime(apiTime);
           setErrorStatus(null);
         })
-        .catch((error) => setErrorStatus(error.message));
+        .catch((error) => {
+          setErrorStatus(error.message);
+        });
     }, 1000);
 
     return () => {
       clearTimeout(timerId);
     };
-  }, [time, timeZone]);
+  }, [time]);
 
   return (
     errorStatus
